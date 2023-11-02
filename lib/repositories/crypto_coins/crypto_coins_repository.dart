@@ -1,9 +1,8 @@
 import 'package:crypto_coin_list/repositories/crypto_coins/crypto_coin.dart';
+import 'package:crypto_coin_list/repositories/crypto_coins/models/crypto_coin_details.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 
 class CryptoCoinsRepository implements AbstractCoinsRepository {
-
   CryptoCoinsRepository({required this.dio});
 
   final Dio dio;
@@ -19,13 +18,17 @@ class CryptoCoinsRepository implements AbstractCoinsRepository {
     // debugPrint('Data = ${response.data.toString()}');
     // debugPrint('dataRaw = ${dataRaw.toString()}');
 
-    final cryptoCoinsList = dataRaw.entries
-        .map((e) => (CryptoCoin(
-      name: e.key,
-      priceInUSD: (e.value['USD'] as Map<String, dynamic>)['PRICE'],
-      imageUrl: 'https://www.cryptocompare.com${(e.value['USD'] as Map<String, dynamic>)['IMAGEURL']}',
-    )))
-        .toList();
+    final cryptoCoinsList = dataRaw.entries.map((e) {
+      final details = CryptoCoinDetails(
+          toSymbol: (e.value['USD'] as Map<String, dynamic>)['TOSYMBOL'],
+          lastUpdate: (e.value['USD'] as Map<String, dynamic>)['LASTUPDATE'],
+          high24Hour: (e.value['USD'] as Map<String, dynamic>)['HIGH24HOUR'],
+          low24Hour: (e.value['USD'] as Map<String, dynamic>)['LOW24HOUR'],
+          priceInUSD: (e.value['USD'] as Map<String, dynamic>)['PRICE'],
+          imageUrl:
+              'https://www.cryptocompare.com${(e.value['USD'] as Map<String, dynamic>)['IMAGEURL']}');
+      return CryptoCoin(name: e.key, details: details);
+    }).toList();
     // debugPrint(cryptoCoinsList.toString());
     return cryptoCoinsList;
   }
