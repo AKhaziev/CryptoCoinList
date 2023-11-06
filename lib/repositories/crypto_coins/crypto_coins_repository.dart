@@ -1,8 +1,7 @@
 import 'package:crypto_coin_list/repositories/crypto_coins/crypto_coin.dart';
-import 'package:crypto_coin_list/repositories/crypto_coins/models/crypto_coin_details.dart';
 import 'package:dio/dio.dart';
 
-class CryptoCoinsRepository implements AbstractCoinsRepository {
+class CryptoCoinsRepository implements AbstractCoinsRepository  {
   CryptoCoinsRepository({required this.dio});
 
   final Dio dio;
@@ -19,6 +18,7 @@ class CryptoCoinsRepository implements AbstractCoinsRepository {
     // debugPrint('dataRaw = ${dataRaw.toString()}');
 
     final cryptoCoinsList = dataRaw.entries.map((e) {
+      // final currencyCode = (e.value['USD'] as Map<String, dynamic>)['FROMSYMBOL'];
       final details = CryptoCoinDetails(
           toSymbol: (e.value['USD'] as Map<String, dynamic>)['TOSYMBOL'],
           lastUpdate: (e.value['USD'] as Map<String, dynamic>)['LASTUPDATE'],
@@ -32,4 +32,31 @@ class CryptoCoinsRepository implements AbstractCoinsRepository {
     // debugPrint(cryptoCoinsList.toString());
     return cryptoCoinsList;
   }
+
+  @override
+  Future<CryptoCoinDetails> getCoinDetails(String currencyCode) async {
+
+    final response = await dio.get(
+        'https://min-api.cryptocompare.com/data/pricemultifull?fsyms=$currencyCode&tsyms=USD');
+    final data = response.data as Map<String, dynamic>;
+    final dataRaw = data['RAW'] as Map<String, dynamic>;
+    final coinData = dataRaw[currencyCode] as Map<String, dynamic>;
+    final usdData = coinData['USD'] as Map<String, dynamic>;
+    final details = CryptoCoinDetails(
+        toSymbol: (usdData)['TOSYMBOL'],
+        lastUpdate: (usdData)['LASTUPDATE'],
+        high24Hour: (usdData)['HIGH24HOUR'],
+        low24Hour: (usdData)['LOW24HOUR'],
+        priceInUSD: (usdData)['PRICE'],
+        imageUrl: 'https://www.cryptocompare.com${(usdData)['IMAGEURL']}'
+    );
+    return details;
+  }
+
+  // Future<CryptoCoinDetails> _fetchCoinDetail(String currencyCode) async {
+  //
+  // }
+
 }
+
+

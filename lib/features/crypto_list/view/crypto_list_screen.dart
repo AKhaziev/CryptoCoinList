@@ -18,7 +18,7 @@ class CryptoListScreen extends StatefulWidget {
 }
 
 class _CryptoListScreenState extends State<CryptoListScreen> {
-  List<CryptoCoin>? _cryptoCoinList;
+  // List<CryptoCoin>? _cryptoCoinList;
 
   final _cryptoListBloc = CryptoListBloc(GetIt.I<AbstractCoinsRepository>());
 
@@ -67,7 +67,7 @@ class _CryptoListScreenState extends State<CryptoListScreen> {
                       style: theme.textTheme.bodyMedium,
                     ),
                     Text(
-                      'Please try againg later',
+                      'Please try again later',
                       style: theme.textTheme.labelSmall?.copyWith(fontSize: 16),
                     ),
                     const SizedBox(height: 30),

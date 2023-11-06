@@ -1,5 +1,6 @@
-import 'package:crypto_coin_list/repositories/crypto_coins/crypto_coin.dart';
+import 'models/models.dart';
 
 abstract class AbstractCoinsRepository {
   Future<List<CryptoCoin>> getCoinsList();
+  Future<CryptoCoinDetails> getCoinDetails(String currencyCode);
 }
