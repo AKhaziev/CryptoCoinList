@@ -1,66 +1,75 @@
 import 'dart:developer';
 
-import 'package:crypto_coin_list/features/crypto_coin/bloc/crypto_coin_bloc.dart';
+import 'package:auto_route/auto_route.dart';
+import 'package:crypto_coin_list/features/crypto_coin/bloc/crypto_coin_details_bloc.dart';
 import 'package:crypto_coin_list/repositories/crypto_coins/crypto_coin.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
 import '../widgets/widgets.dart';
 
+@RoutePage()
 class CryptoCoinScreen extends StatefulWidget {
   const CryptoCoinScreen({
     super.key,
+    required this.coin,
   });
+
+  final CryptoCoin coin;
 
   @override
   State<CryptoCoinScreen> createState() => _CryptoCoinScreenState();
 }
 
 class _CryptoCoinScreenState extends State<CryptoCoinScreen> {
-  String coinName = '';
-  CryptoCoinDetails? coin;
+  // String coinName = '';
+  // CryptoCoinDetails? coin;
 
-  final _cryptoCoinBloc = CryptoCoinBloc(GetIt.I<AbstractCoinsRepository>());
+  // final _cryptoCoinBloc = CryptoCoinDetailsBloc(GetIt.I<AbstractCoinsRepository>());
+  final _coinDetailsBloc = CryptoCoinDetailsBloc(
+    GetIt.I<AbstractCoinsRepository>(),
+  );
 
   @override
   void initState() {
-    _cryptoCoinBloc.add(LoadCryptoCoin());
+    _coinDetailsBloc.add(LoadCryptoCoinDetails(currencyCode: widget.coin.name));
+    super.initState();
   }
 
-  @override
-  void didChangeDependencies() {
-    final args = ModalRoute.of(context)?.settings.arguments;
-    log(args.toString());
-    assert(args != null && args is String, "You must provide String args");
-    coinName = args as String;
-    _loadCryptoCoinDetail(coinName);
-    // setState(() {});
-    super.didChangeDependencies();
-  }
+  // @override
+  // void didChangeDependencies() {
+  //   final args = ModalRoute.of(context)?.settings.arguments;
+  //   log(args.toString());
+  //   assert(args != null && args is String, "You must provide String args");
+  //   coinName = args as String;
+  //   _loadCryptoCoinDetail(coinName);
+  //   // setState(() {});
+  //   super.didChangeDependencies();
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      // appBar: AppBar(
-      //   centerTitle: true,
-      //   // leading: const Icon(Icons.arrow_back),
-      //   title: Text(coinName),
-      // ),
-      body: (coin == null)
-          ? const Center(child: CircularProgressIndicator())
-          : Center(
+      body: BlocBuilder<CryptoCoinDetailsBloc, CryptoCoinDetailsState>(
+        bloc: _coinDetailsBloc,
+        builder: (context, state) {
+          if (state is CryptoCoinDetailsLoaded) {
+            final coin = state.coin;
+            final coinDetails = coin.details;
+            return Center(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(
                     height: 160,
                     width: 160,
-                    child: Image.network(coin!.imageUrl),
+                    child: Image.network(coinDetails.imageUrl),
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    coinName,
+                    coin.name,
                     style: const TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w700,
@@ -70,7 +79,7 @@ class _CryptoCoinScreenState extends State<CryptoCoinScreen> {
                   BaseCard(
                     child: Center(
                       child: Text(
-                        '${coin!.priceInUSD.toStringAsFixed(2)} \$',
+                        '${coinDetails.priceInUSD} \$',
                         style: const TextStyle(
                           fontSize: 26,
                           fontWeight: FontWeight.w700,
@@ -83,40 +92,25 @@ class _CryptoCoinScreenState extends State<CryptoCoinScreen> {
                       children: [
                         _DataRow(
                           title: 'Hight 24 Hour',
-                          value: '${coin!.high24Hour.toStringAsFixed(2)} \$',
+                          value: '${coinDetails.high24Hour} \$',
                         ),
                         const SizedBox(height: 6),
                         _DataRow(
                           title: 'Low 24 Hour',
-                          value: '${coin!.low24Hour.toStringAsFixed(2)} \$',
+                          value: '${coinDetails.low24Hour} \$',
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
-            ),
+            );
+          }
+          return const Center(child: CircularProgressIndicator());
+        },
+      ),
     );
   }
-
-  Future<void> _loadCryptoCoinDetail(String coinName) async {
-    coin = await GetIt.I<AbstractCoinsRepository>().getCoinDetails(coinName);
-    setState(() {});
-    debugPrint(coin.toString());
-  }
-
-//   static IconData _getIconData(TargetPlatform platform) {
-//     switch (platform) {
-//       case TargetPlatform.android:
-//       case TargetPlatform.fuchsia:
-//       case TargetPlatform.linux:
-//       case TargetPlatform.windows:
-//         return Icons.arrow_back;
-//       case TargetPlatform.iOS:
-//       case TargetPlatform.macOS:
-//         return Icons.arrow_back_ios;
-//     }
-//   }
 }
 
 class _DataRow extends StatelessWidget {

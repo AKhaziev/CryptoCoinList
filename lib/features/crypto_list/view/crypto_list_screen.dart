@@ -1,12 +1,15 @@
 import 'dart:async';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:crypto_coin_list/features/crypto_list/bloc/crypto_list_bloc.dart';
 import 'package:crypto_coin_list/repositories/crypto_coins/crypto_coin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 import '../crypto_list.dart';
 
+@RoutePage()
 class CryptoListScreen extends StatefulWidget {
   const CryptoListScreen({
     super.key,
@@ -36,6 +39,15 @@ class _CryptoListScreenState extends State<CryptoListScreen> {
           centerTitle: true,
           // leading: const Icon(Icons.arrow_back),
           title: const Text('Crypto Currencies List'),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          TalkerScreen(talker: GetIt.I<Talker>())));
+                },
+                icon: const Icon(Icons.document_scanner_outlined))
+          ],
         ),
         body: RefreshIndicator(
           onRefresh: () async {
@@ -58,7 +70,8 @@ class _CryptoListScreenState extends State<CryptoListScreen> {
                     });
               }
               if (state is CryptoListLoadingFailure) {
-                return Center(child: Column(
+                return Center(
+                    child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -74,7 +87,8 @@ class _CryptoListScreenState extends State<CryptoListScreen> {
                     TextButton(
                         onPressed: () {
                           _cryptoListBloc.add(LoadCryptoList());
-                        }, child: const Text('Try again'))
+                        },
+                        child: const Text('Try again'))
                   ],
                 ));
               }

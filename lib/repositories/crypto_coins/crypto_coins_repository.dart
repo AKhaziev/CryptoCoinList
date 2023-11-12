@@ -19,7 +19,7 @@ class CryptoCoinsRepository implements AbstractCoinsRepository  {
 
     final cryptoCoinsList = dataRaw.entries.map((e) {
       // final currencyCode = (e.value['USD'] as Map<String, dynamic>)['FROMSYMBOL'];
-      final details = CryptoCoinDetails(
+      final details = CryptoCoinDetail(
           toSymbol: (e.value['USD'] as Map<String, dynamic>)['TOSYMBOL'],
           lastUpdate: (e.value['USD'] as Map<String, dynamic>)['LASTUPDATE'],
           high24Hour: (e.value['USD'] as Map<String, dynamic>)['HIGH24HOUR'],
@@ -33,8 +33,9 @@ class CryptoCoinsRepository implements AbstractCoinsRepository  {
     return cryptoCoinsList;
   }
 
+
   @override
-  Future<CryptoCoinDetails> getCoinDetails(String currencyCode) async {
+  Future<CryptoCoin> getCoinDetails(String currencyCode) async {
 
     final response = await dio.get(
         'https://min-api.cryptocompare.com/data/pricemultifull?fsyms=$currencyCode&tsyms=USD');
@@ -42,7 +43,7 @@ class CryptoCoinsRepository implements AbstractCoinsRepository  {
     final dataRaw = data['RAW'] as Map<String, dynamic>;
     final coinData = dataRaw[currencyCode] as Map<String, dynamic>;
     final usdData = coinData['USD'] as Map<String, dynamic>;
-    final details = CryptoCoinDetails(
+    final details = CryptoCoinDetail(
         toSymbol: (usdData)['TOSYMBOL'],
         lastUpdate: (usdData)['LASTUPDATE'],
         high24Hour: (usdData)['HIGH24HOUR'],
@@ -50,12 +51,8 @@ class CryptoCoinsRepository implements AbstractCoinsRepository  {
         priceInUSD: (usdData)['PRICE'],
         imageUrl: 'https://www.cryptocompare.com${(usdData)['IMAGEURL']}'
     );
-    return details;
+    return CryptoCoin(name: currencyCode, details: details);
   }
-
-  // Future<CryptoCoinDetails> _fetchCoinDetail(String currencyCode) async {
-  //
-  // }
 
 }
 

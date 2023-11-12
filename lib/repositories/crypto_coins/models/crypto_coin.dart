@@ -1,4 +1,4 @@
-import 'package:crypto_coin_list/repositories/crypto_coins/models/crypto_coin_details.dart';
+import 'package:crypto_coin_list/repositories/crypto_coins/models/crypto_coin_detail.dart';
 import 'package:equatable/equatable.dart';
 
 class CryptoCoin extends Equatable {
@@ -8,7 +8,7 @@ class CryptoCoin extends Equatable {
   });
 
   final String name;
-  final CryptoCoinDetails details;
+  final CryptoCoinDetail details;
 
   @override
   String toString() {
