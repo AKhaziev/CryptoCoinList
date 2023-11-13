@@ -6,12 +6,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:talker_bloc_logger/talker_bloc_logger.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
 import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'crypto_currencies_list_app.dart';
 import 'firebase_options.dart';
+
+const cryptoCoinBoxName = 'crypto_coin_box';
 
 void main() async {
 
@@ -20,7 +23,13 @@ void main() async {
   GetIt.I.registerSingleton(talker);
   GetIt.I<Talker>().debug('Talker started...');
 
-  final app =  Firebase.initializeApp(
+  await Hive.initFlutter();
+  Hive.registerAdapter(CryptoCoinAdapter());
+  Hive.registerAdapter(CryptoCoinDetailAdapter());
+
+  final cryptoCoinBox = await Hive.openBox<CryptoCoin>(cryptoCoinBoxName );
+
+  Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   // talker.info(app.options.name);
@@ -39,7 +48,7 @@ void main() async {
   );
 
   GetIt.I.registerSingleton<AbstractCoinsRepository>(
-      CryptoCoinsRepository(dio: dio)
+      CryptoCoinsRepository(dio: dio, cryptoCoinBox: cryptoCoinBox)
   );
 
   Bloc.observer = TalkerBlocObserver(

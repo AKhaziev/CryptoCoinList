@@ -16,7 +16,7 @@ class CryptoCoinTile extends StatelessWidget {
     final theme = Theme.of(context);
     return ListTile(
       leading: Image.network(
-          coin.details.imageUrl,
+          coin.details.fullImageUrl,
       // leading: SvgPicture.asset(
       //   'assets/images/logo_bitcoin.svg',
         height: 48,

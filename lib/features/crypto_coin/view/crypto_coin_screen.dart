@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:crypto_coin_list/features/crypto_coin/bloc/crypto_coin_details_bloc.dart';
 import 'package:crypto_coin_list/repositories/crypto_coins/crypto_coin.dart';
@@ -65,7 +63,7 @@ class _CryptoCoinScreenState extends State<CryptoCoinScreen> {
                   SizedBox(
                     height: 160,
                     width: 160,
-                    child: Image.network(coinDetails.imageUrl),
+                    child: Image.network(coinDetails.fullImageUrl),
                   ),
                   const SizedBox(height: 24),
                   Text(
@@ -79,7 +77,7 @@ class _CryptoCoinScreenState extends State<CryptoCoinScreen> {
                   BaseCard(
                     child: Center(
                       child: Text(
-                        '${coinDetails.priceInUSD} \$',
+                        '${coinDetails.priceInUSD.toStringAsFixed(2)} \$',
                         style: const TextStyle(
                           fontSize: 26,
                           fontWeight: FontWeight.w700,
@@ -92,12 +90,12 @@ class _CryptoCoinScreenState extends State<CryptoCoinScreen> {
                       children: [
                         _DataRow(
                           title: 'Hight 24 Hour',
-                          value: '${coinDetails.high24Hour} \$',
+                          value: '${coinDetails.high24Hour.toStringAsFixed(2)} \$',
                         ),
                         const SizedBox(height: 6),
                         _DataRow(
                           title: 'Low 24 Hour',
-                          value: '${coinDetails.low24Hour} \$',
+                          value: '${coinDetails.low24Hour.toStringAsFixed(2)} \$',
                         ),
                       ],
                     ),
